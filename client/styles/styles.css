@@ -84,7 +84,8 @@ form input[type=text] {
     padding: 10px;
 }
 
-.friend {
+.addFriend {
+    margin: auto;
     color: #fff;
     background-color: #0090da;
 }
