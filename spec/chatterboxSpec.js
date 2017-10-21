@@ -24,11 +24,11 @@ describe('chatterbox', function() {
 
     describe('sending', function() {
       it('should have a send method', function() {
-        expect(app.send).to.be.ok;
+        expect(app.postMessage).to.be.ok;
       });
 
       it('should submit a POST request via $.ajax', function(done) {
-        app.send([]);
+        app.postMessage([]);
         expect($.ajax.calledOnce).to.be.true;
         // sinon.spy method `args` comes in the form [function calls][arguments from that call]
         ajaxOptions = typeof $.ajax.args[0][0] === 'object' ? $.ajax.args[0][0] : $.ajax.args[0][1];
@@ -43,7 +43,7 @@ describe('chatterbox', function() {
           roomname: 'lobby'
         };
 
-        app.send(message);
+        app.postMessage(message);
         ajaxOptions = typeof $.ajax.args[0][0] === 'object' ? $.ajax.args[0][0] : $.ajax.args[0][1];
         var result = ajaxOptions.data;
         expect(result).to.deep.equal(message);
@@ -54,11 +54,11 @@ describe('chatterbox', function() {
 
     describe('fetching', function() {
       it('should have a fetch method', function() {
-        expect(app.fetch).to.be.ok;
+        expect(app.getMessages).to.be.ok;
       });
 
       it('should submit a GET request via $.ajax', function(done) {
-        app.fetch();
+        app.getMessages();
         expect($.ajax.calledOnce).to.be.true;
         ajaxUrl = typeof $.ajax.args[0][0] === 'string' ? $.ajax.args[0][0] : $.ajax.args[0][0].url;
         expect(ajaxUrl).to.equal(app.server);

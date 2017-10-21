@@ -28,29 +28,24 @@
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
 
-      <div id="roomSelector">Room
-        <select>
+      <div>Room
+        <select id="roomSelect">
           <option value="HackReactor">HackReactor</option>
           <option value="Lobby">Lobby</option>
         </select>
       </button>
+      </div>
 
-      <div id="chat">laksdf</div>
-
-      <!-- inputbox for composing a message -->
-      <div id="messageContainer"></div>
 
       <div>
-<!--         <form>
-          <input type="text" name="enterMesssage"><br>
-        </form>
- -->    <textarea id="messageBox" rows="4" cols="50">Enter text here</textarea>
+        <textarea id="messageBox" rows="4" cols="50">Enter text here</textarea>
         <br>
         <button id="postMessage">Send a Message</button>
 
+      <div id="chats"></div>
 
       </div>
-
+      <button id="clearMessages">clear messages</button>
       <button id="addFriend">Add a Friend</button>
       <button id="getMessages">Get messages</button>
 
