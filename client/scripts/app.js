@@ -22,7 +22,8 @@ var app = {
       $('#roomSelector').on('click', function(event) {
         app.getRoomMessages();
       }); 
-
+      // app.renderRoom('lobby');
+      app.getMessages();
 
     });
 
@@ -59,7 +60,6 @@ var app = {
   },
 
   getMessages: function() {
-    // console.log('I\'ve been clicked');
     $.ajax({
       url: app.server,
       type: 'GET',
@@ -68,7 +68,8 @@ var app = {
 
 // Must render these when they come back.
         app.clearMessages();
-        for (var i = 0; i < data['results'].length; i++) {
+        app.fetchRoomNames(data);
+        for (var i = data['results'].length - 1; i > 0; i--) {
           app.renderMessage(data['results'][i]);
         }
       },
@@ -80,8 +81,15 @@ var app = {
 
 // render message onto the DOM
   renderMessage: function(messageObj) {
-    var string = messageObj['username'] + '\n' + messageObj['text'] + '\n' + messageObj['roomname'] + '\n' + '';
-    $('#chats').append('<div class="chat">' + string + '</div>');
+    //TODO: maybe we should change the test instead of doing this hacky thing
+    if (document.getElementById('roomSelect').value === '') {
+      var string = messageObj['username'] + '\n' + messageObj['text'] + '\n' + messageObj['roomname'] + '\n' + '';
+      $('#chats').append('<div class="chat">' + string + '</div>');
+    }
+    if (document.getElementById('roomSelect').value === messageObj['roomname']) {
+      var string = messageObj['username'] + '\n' + messageObj['text'] + '\n' + messageObj['roomname'] + '\n' + '';
+      $('#chats').append('<div class="chat">' + string + '</div>');
+    }
   },
 
 
@@ -91,25 +99,38 @@ var app = {
     document.getElementById('chats').innerHTML = '';
   },
 
-
-  getRoomNameList: function() {
-  // get all the messages back and pull out the roomnames
-  // add as option tags
-
-  },
-// // Room name list: append room names to ".roomSelector"
-
   renderRoom: function(newRoomName) {
+    var children = $('#roomSelect').children();
     // we are adding it to the list of options
-    $('#roomSelect').append('<option value="' + newRoomName + '">' + newRoomName + '</option>');
+    var contains = false;
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].value === newRoomName) {
+        contains = true;
+      }
+    }
+
+    if (!contains) {
+      $('#roomSelect').append('<option value="' + newRoomName + '">' + newRoomName + '</option>');
+    }
   },
 
-  filterMessagesByRoomName: function() {
+  fetchRoomNames: function(resultsObj) {
+    var rooms = {};
+    // so we can iterate the array of message objects
+    for (var i = 0; i < resultsObj['results'].length; i++) {
+      // pull out the roomnames to an obj where key is room name and value is true
+      rooms[resultsObj['results'][i]['roomname']] = 1;
+    }
+// Object.keys(on the roomObj) and loop over and renderRoom.
+    Object.keys(rooms).forEach(function(item) {
+      app.renderRoom(item);
+    });
+  },
+
+  handleUsernameClick: function() {
 
   }
-//   app.fetchRoomNames = function() {
 
-//   };
 
 
 };
@@ -118,21 +139,8 @@ app.init();
 
 
 // Nice to have: Refresh every 10 seconds
-
-
-// Add rooms to the DOM = somehow make new roomname filter
-// You can filter this blob and get all the room names
-// Or somehow keep track of added roomnames?
-
 // events
 // Add a friend by clicking their username
-
-// 
-
-//};
-
-
-// Question: How do we know all the room names?
 
 
 
