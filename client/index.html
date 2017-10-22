@@ -29,24 +29,25 @@
       <!-- Your HTML goes here! -->
 
       <div>View Messages by<br>
-        Room<select id="roomSelect">
+        Room<select id="roomSelect" margin="20" padding="100">
         </select><br>
-        Friends<select id="friendSelect">
+        Friends<select id="friendSelect" margin="20" padding="100">
         </select>
       </button>
       </div>
 
 
       <div>
-        <textarea id="messageBox" rows="4" cols="50">Enter text here</textarea>
+        <textarea id="messageBox" rows="4" cols="80" placeholder="Enter text here"></textarea>
         <br>
+
         <button id="postMessage">Send a Message</button>
+        <button id="getMessages">Get messages</button>
+        <button id="clearMessages">Clear messages</button>
 
       <div id="chats"></div>
 
       </div>
-      <button id="clearMessages">clear messages</button>
-      <button id="getMessages">Get messages</button>
 
     </div>
   </body>

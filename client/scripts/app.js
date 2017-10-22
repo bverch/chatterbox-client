@@ -5,6 +5,7 @@ var app = {
   server: 'http://parse.sfm6.hackreactor.com/chatterbox/classes/messages',
   friends: {},
 
+
   init: function() {
     $(document).ready(function() {
       $('#postMessage').on('click', function(event) {
@@ -21,16 +22,11 @@ var app = {
 
       $('#roomSelector').on('click', function(event) {
         app.getRoomMessages();
-      }); 
- 
+      });
+      
       app.getMessages();
 
     });
-
-  
-
-  // calls render messages on initial fetch of messages
-  // appendTo("body")
   },
 
   // method for preparing an object to pass into postMessages
@@ -46,7 +42,6 @@ var app = {
   },
 
   postMessage: function(message) {
-    
     $.ajax({
       url: app.server,
       type: 'POST',
@@ -63,6 +58,7 @@ var app = {
   },
 
   handleSubmit: function() {
+    $('#messageBox').val('');
     var message = app.composeMessage();
     app.postMessage(message);
   },
@@ -73,7 +69,9 @@ var app = {
       url: app.server,
       type: 'GET',
       'Retry-After': 6000,
+      data: 'where{"roomname":' + document.getElementById('messageBox').value + '}',
       data: 'order=-createdAt',
+      data: 'limit=200',
       success: function(data) {
         // Must render these when they come back.
         app.clearMessages();
@@ -89,32 +87,28 @@ var app = {
     });
   },
 
-  escapeString: function(string) {
-  // loop over the string if the char is '<' substitute &length
-    for (var i = 0; i < string.length; i++) {
-      if (string[i] === '<') {
-        string = string.slice(0, i) + '&lt' + string.slice(i + 1);
-      } else if (string[i] === '>') {
-        string = string.slice(0, i) + '&gt' + string.slice(i + 1);
-      } else if (string[i] === '&') {
-        string = string.slice(0, i) + '&amp' + string.slice(i + 1);
-      } else if (string[i] === '"') {
-        string = string.slice(0, i) + '&quot' + string.slice(i + 1);
-      } else if (string[i] === "'") {
-        string = string.slice(0, i) + '&#x27' + string.slice(i + 1); 
-      } else if (string[i] === '/') {
-        string = string.slice(0, i) + '&#x2f' + string.slice(i + 1); 
-      }
-    }
-    return string;
-  },
+  // escapeString: function(string) {
+  // // loop over the string if the char is '<' substitute &length
+  //   for (var i = 0; i < string.length; i++) {
+  //     if (string[i] === '<') {
+  //       string = string.slice(0, i) + '&lt' + string.slice(i + 1);
+  //     } else if (string[i] === '>') {
+  //       string = string.slice(0, i) + '&gt' + string.slice(i + 1);
+  //     } else if (string[i] === '&') {
+  //       string = string.slice(0, i) + '&amp' + string.slice(i + 1);
+  //     } else if (string[i] === '"') {
+  //       string = string.slice(0, i) + '&quot' + string.slice(i + 1);
+  //     } else if (string[i] === "'") {
+  //       string = string.slice(0, i) + '&#x27' + string.slice(i + 1); 
+  //     } else if (string[i] === '/') {
+  //       string = string.slice(0, i) + '&#x2f' + string.slice(i + 1); 
+  //     }
+  //   }
+  //   return string;
+  // },
 
-
-// render message onto the DOM
+  // render message onto the DOM
   renderMessage: function(messageObj) {
-    // does this message content match the filters?
-    // try to see filter that is selected for both room and friends    
-
 
     var span = $('<span/>');
     span.click(function() { app.handleUsernameClick(span); });
@@ -123,6 +117,7 @@ var app = {
     var div = $('<div/>');
     div.text(' says: ' + messageObj['text'] + '  in room: ' + messageObj['roomname']);
     div.prepend(span);
+    div.addClass('chat');
 
     if (document.getElementById('roomSelect').value === '') {
       $('#chats').append(div);
@@ -136,8 +131,6 @@ var app = {
     }
   },
 
-
-
   clearMessages: function() {
     // empty out the class='chat'
     document.getElementById('chats').innerHTML = '';
@@ -147,15 +140,16 @@ var app = {
     var children = $('#roomSelect').children();
     // we are adding it to the list of options
     var contains = false;
-    for (var i = 0; i < children.length; i++) {
-      if (children[i].value === app.escapeString(newRoomName)) {
-        contains = true;
-      }
-    }
 
     var option = $('<option/>');
     option.attr('value', newRoomName);
-    option.text(app.escapeString(newRoomName));
+    option.text(newRoomName);
+
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].value === option.text()) {
+        contains = true;
+      }
+    }
 
     if (!contains) {
       $('#roomSelect').append(option);
@@ -168,25 +162,24 @@ var app = {
     for (var k in app.friends) {
       var option = $('<option/>');
       option.attr('value', k);
-      option.text(app.escapeString(k));
+      option.text(k);
       $('#friendSelect').append(option);
     }
   },
-
   
   renderFriendMessages: function(friendName) {
     var children = $('#friendSelect').children(); 
     // we are adding it to the list of options
     var contains = false;
-    for (var i = 0; i < children.length; i++) {
-      if (children[i].value === app.escapeString(friendName)) {
-        contains = true;
-      }
-    }
 
     var option = $('<option/>');
     option.attr('value', friendName);
-    option.text(app.escapeString(friendName));
+    option.text(friendName);
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].value === friendName) {
+        contains = true;
+      }
+    }
 
     if (!contains) {
       $('#friendSelect').append(option);
@@ -219,26 +212,15 @@ var app = {
     });
   },
 
-
-
   handleUsernameClick: function(span) {
     console.log(span[0].textContent);
     app.friends[span[0].textContent] = span[0].textContent;
     app.renderFriendList();
   }
 
-
-
 };
 
 app.init();
-
-
-// Nice to have: Refresh every 10 seconds
-// events
-// Add a friend by clicking their username
-
-
 
 
 
